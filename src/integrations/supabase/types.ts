@@ -14,7 +14,138 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      checklists: {
+        Row: {
+          alinhamento_balanceamento: string
+          alinhamento_balanceamento_obs: string | null
+          bancos_estofamentos: string
+          bancos_estofamentos_obs: string | null
+          calibragem_pneus: string
+          calibragem_pneus_obs: string | null
+          cintos_seguranca: string
+          cintos_seguranca_obs: string | null
+          condutor: string
+          correias_mangueiras: string
+          correias_mangueiras_obs: string | null
+          created_at: string
+          data: string
+          desgaste_banda: string
+          desgaste_banda_obs: string | null
+          estepe: string
+          estepe_obs: string | null
+          fluido_freio: string
+          fluido_freio_obs: string | null
+          id: string
+          limpeza_externa: string
+          limpeza_externa_obs: string | null
+          limpeza_interna: string
+          limpeza_interna_obs: string | null
+          macaco_chave_roda: string
+          macaco_chave_roda_obs: string | null
+          nivel_agua_radiador: string
+          nivel_agua_radiador_obs: string | null
+          nivel_oleo_motor: string
+          nivel_oleo_motor_obs: string | null
+          observacoes_adicionais: string | null
+          placa_veiculo: string
+          responsavel: string
+          ruidos_anormais: string
+          ruidos_anormais_obs: string | null
+          tapetes_acabamento: string
+          tapetes_acabamento_obs: string | null
+          triangulo_sinalizacao: string
+          triangulo_sinalizacao_obs: string | null
+          vazamentos_visiveis: string
+          vazamentos_visiveis_obs: string | null
+        }
+        Insert: {
+          alinhamento_balanceamento: string
+          alinhamento_balanceamento_obs?: string | null
+          bancos_estofamentos: string
+          bancos_estofamentos_obs?: string | null
+          calibragem_pneus: string
+          calibragem_pneus_obs?: string | null
+          cintos_seguranca: string
+          cintos_seguranca_obs?: string | null
+          condutor: string
+          correias_mangueiras: string
+          correias_mangueiras_obs?: string | null
+          created_at?: string
+          data: string
+          desgaste_banda: string
+          desgaste_banda_obs?: string | null
+          estepe: string
+          estepe_obs?: string | null
+          fluido_freio: string
+          fluido_freio_obs?: string | null
+          id?: string
+          limpeza_externa: string
+          limpeza_externa_obs?: string | null
+          limpeza_interna: string
+          limpeza_interna_obs?: string | null
+          macaco_chave_roda: string
+          macaco_chave_roda_obs?: string | null
+          nivel_agua_radiador: string
+          nivel_agua_radiador_obs?: string | null
+          nivel_oleo_motor: string
+          nivel_oleo_motor_obs?: string | null
+          observacoes_adicionais?: string | null
+          placa_veiculo: string
+          responsavel: string
+          ruidos_anormais: string
+          ruidos_anormais_obs?: string | null
+          tapetes_acabamento: string
+          tapetes_acabamento_obs?: string | null
+          triangulo_sinalizacao: string
+          triangulo_sinalizacao_obs?: string | null
+          vazamentos_visiveis: string
+          vazamentos_visiveis_obs?: string | null
+        }
+        Update: {
+          alinhamento_balanceamento?: string
+          alinhamento_balanceamento_obs?: string | null
+          bancos_estofamentos?: string
+          bancos_estofamentos_obs?: string | null
+          calibragem_pneus?: string
+          calibragem_pneus_obs?: string | null
+          cintos_seguranca?: string
+          cintos_seguranca_obs?: string | null
+          condutor?: string
+          correias_mangueiras?: string
+          correias_mangueiras_obs?: string | null
+          created_at?: string
+          data?: string
+          desgaste_banda?: string
+          desgaste_banda_obs?: string | null
+          estepe?: string
+          estepe_obs?: string | null
+          fluido_freio?: string
+          fluido_freio_obs?: string | null
+          id?: string
+          limpeza_externa?: string
+          limpeza_externa_obs?: string | null
+          limpeza_interna?: string
+          limpeza_interna_obs?: string | null
+          macaco_chave_roda?: string
+          macaco_chave_roda_obs?: string | null
+          nivel_agua_radiador?: string
+          nivel_agua_radiador_obs?: string | null
+          nivel_oleo_motor?: string
+          nivel_oleo_motor_obs?: string | null
+          observacoes_adicionais?: string | null
+          placa_veiculo?: string
+          responsavel?: string
+          ruidos_anormais?: string
+          ruidos_anormais_obs?: string | null
+          tapetes_acabamento?: string
+          tapetes_acabamento_obs?: string | null
+          triangulo_sinalizacao?: string
+          triangulo_sinalizacao_obs?: string | null
+          vazamentos_visiveis?: string
+          vazamentos_visiveis_obs?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
