@@ -12,11 +12,11 @@ import { useToast } from "@/hooks/use-toast";
 const VehicleUsage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [vehicleInfo, setVehicleInfo] = useState({
-    responsavelVeiculo: "",
-    veiculo: "",
-    periodoReferencia: "",
-  });
+  const vehicleInfo = {
+    responsavelVeiculo: "RESPONSÁVEL FIXO",
+    veiculo: "SANDERO",
+    periodoReferencia: new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase(),
+  };
 
   const [formData, setFormData] = useState({
     data: new Date().toISOString().split('T')[0],
@@ -30,14 +30,6 @@ const VehicleUsage = () => {
     assinatura: "",
   });
 
-  useEffect(() => {
-    const storedInfo = sessionStorage.getItem("vehicleUsageInfo");
-    if (!storedInfo) {
-      navigate("/controle-uso-info");
-      return;
-    }
-    setVehicleInfo(JSON.parse(storedInfo));
-  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +57,6 @@ const VehicleUsage = () => {
         description: "O controle de uso do veículo foi registrado.",
       });
 
-      sessionStorage.removeItem("vehicleUsageInfo");
       navigate("/sucesso-uso");
     } catch (error) {
       console.error("Erro ao salvar:", error);

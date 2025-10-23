@@ -43,7 +43,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={() => navigate("/controle-uso-info")}>
+            <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={() => navigate("/controle-uso")}>
               <CardHeader>
                 <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
                   <Car className="w-6 h-6 text-accent" />
