@@ -146,6 +146,57 @@ export type Database = {
         }
         Relationships: []
       }
+      controle_uso_veiculo: {
+        Row: {
+          assinatura: string | null
+          created_at: string
+          data: string
+          destino_finalidade: string
+          hora_retorno: string
+          hora_saida: string
+          id: string
+          km_final: number
+          km_inicial: number
+          nome_motorista: string
+          observacoes: string | null
+          periodo_referencia: string
+          responsavel_veiculo: string
+          veiculo: string
+        }
+        Insert: {
+          assinatura?: string | null
+          created_at?: string
+          data: string
+          destino_finalidade: string
+          hora_retorno: string
+          hora_saida: string
+          id?: string
+          km_final: number
+          km_inicial: number
+          nome_motorista: string
+          observacoes?: string | null
+          periodo_referencia: string
+          responsavel_veiculo: string
+          veiculo: string
+        }
+        Update: {
+          assinatura?: string | null
+          created_at?: string
+          data?: string
+          destino_finalidade?: string
+          hora_retorno?: string
+          hora_saida?: string
+          id?: string
+          km_final?: number
+          km_inicial?: number
+          nome_motorista?: string
+          observacoes?: string | null
+          periodo_referencia?: string
+          responsavel_veiculo?: string
+          veiculo?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

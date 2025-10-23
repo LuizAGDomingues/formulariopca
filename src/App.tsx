@@ -9,6 +9,10 @@ import ChecklistInfo from "./pages/ChecklistInfo";
 import Checklist from "./pages/Checklist";
 import Success from "./pages/Success";
 import History from "./pages/History";
+import VehicleUsageInfo from "./pages/VehicleUsageInfo";
+import VehicleUsage from "./pages/VehicleUsage";
+import VehicleUsageSuccess from "./pages/VehicleUsageSuccess";
+import VehicleUsageHistory from "./pages/VehicleUsageHistory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +29,10 @@ const App = () => (
           <Route path="/checklist" element={<Checklist />} />
           <Route path="/sucesso" element={<Success />} />
           <Route path="/historico" element={<History />} />
+          <Route path="/controle-uso-info" element={<VehicleUsageInfo />} />
+          <Route path="/controle-uso" element={<VehicleUsage />} />
+          <Route path="/sucesso-uso" element={<VehicleUsageSuccess />} />
+          <Route path="/historico-uso" element={<VehicleUsageHistory />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
