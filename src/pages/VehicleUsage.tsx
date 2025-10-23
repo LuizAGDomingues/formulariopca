@@ -13,7 +13,7 @@ const VehicleUsage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const vehicleInfo = {
-    responsavelVeiculo: "RESPONSÁVEL FIXO",
+    responsavelVeiculo: "CAIQUE FIALI",
     veiculo: "SANDERO",
     periodoReferencia: new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase(),
   };
