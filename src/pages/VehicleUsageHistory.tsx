@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Car, ArrowLeft, Calendar, User, Clock, Navigation } from "lucide-react";
+import { Car, ArrowLeft, Calendar, User, Clock, Navigation, Download } from "lucide-react";
+import * as XLSX from 'xlsx';
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -68,6 +69,45 @@ const VehicleUsageHistory = () => {
     return (final - initial).toFixed(1);
   };
 
+  const exportToExcel = () => {
+    if (records.length === 0) {
+      toast({
+        title: "Nenhum registro para exportar",
+        description: "Não há dados disponíveis para exportação.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const exportData = records.map(record => ({
+      'Data': formatDate(record.data),
+      'Veículo': record.veiculo,
+      'Período': record.periodo_referencia,
+      'Responsável': record.responsavel_veiculo,
+      'Motorista': record.nome_motorista,
+      'Hora Saída': formatTime(record.hora_saida),
+      'Hora Retorno': formatTime(record.hora_retorno),
+      'Destino/Finalidade': record.destino_finalidade,
+      'KM Inicial': record.km_inicial,
+      'KM Final': record.km_final,
+      'KM Percorrido': calculateKmDiff(record.km_inicial, record.km_final),
+      'Observações': record.observacoes || '',
+      'Assinatura': record.assinatura,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Controle de Uso');
+    
+    const fileName = `controle_uso_veiculos_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.xlsm`;
+    XLSX.writeFile(workbook, fileName, { bookType: 'xlsm' });
+
+    toast({
+      title: "Exportação concluída",
+      description: "O arquivo foi baixado com sucesso.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -84,6 +124,13 @@ const VehicleUsageHistory = () => {
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Histórico de Uso de Veículos</h1>
           <p className="text-muted-foreground">Consulte os registros de utilização dos veículos</p>
+          
+          {records.length > 0 && (
+            <Button onClick={exportToExcel} className="mt-4" variant="outline">
+              <Download className="w-4 h-4 mr-2" />
+              Exportar para Excel
+            </Button>
+          )}
         </div>
 
         {loading ? (
@@ -96,10 +143,7 @@ const VehicleUsageHistory = () => {
           <Card>
             <CardContent className="py-12 text-center">
               <Car className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground mb-4">Nenhum registro de uso encontrado</p>
-              <Button onClick={() => navigate("/controle-uso-info")}>
-                Registrar Primeiro Uso
-              </Button>
+              <p className="text-muted-foreground">Nenhum registro de uso encontrado</p>
             </CardContent>
           </Card>
         ) : (
