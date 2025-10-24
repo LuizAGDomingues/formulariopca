@@ -152,15 +152,16 @@ export type Database = {
           created_at: string
           data: string
           destino_finalidade: string
-          hora_retorno: string
+          hora_retorno: string | null
           hora_saida: string
           id: string
-          km_final: number
+          km_final: number | null
           km_inicial: number
           nome_motorista: string
           observacoes: string | null
           periodo_referencia: string
           responsavel_veiculo: string
+          status: string
           veiculo: string
         }
         Insert: {
@@ -168,15 +169,16 @@ export type Database = {
           created_at?: string
           data: string
           destino_finalidade: string
-          hora_retorno: string
+          hora_retorno?: string | null
           hora_saida: string
           id?: string
-          km_final: number
+          km_final?: number | null
           km_inicial: number
           nome_motorista: string
           observacoes?: string | null
           periodo_referencia: string
           responsavel_veiculo: string
+          status?: string
           veiculo: string
         }
         Update: {
@@ -184,15 +186,16 @@ export type Database = {
           created_at?: string
           data?: string
           destino_finalidade?: string
-          hora_retorno?: string
+          hora_retorno?: string | null
           hora_saida?: string
           id?: string
-          km_final?: number
+          km_final?: number | null
           km_inicial?: number
           nome_motorista?: string
           observacoes?: string | null
           periodo_referencia?: string
           responsavel_veiculo?: string
+          status?: string
           veiculo?: string
         }
         Relationships: []

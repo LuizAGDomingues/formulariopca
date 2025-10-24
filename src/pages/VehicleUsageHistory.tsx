@@ -15,12 +15,13 @@ interface VehicleUsageRecord {
   data: string;
   nome_motorista: string;
   hora_saida: string;
-  hora_retorno: string;
+  hora_retorno: string | null;
   destino_finalidade: string;
   km_inicial: number;
-  km_final: number;
+  km_final: number | null;
   observacoes: string | null;
-  assinatura: string;
+  assinatura: string | null;
+  status: string;
   created_at: string;
 }
 
@@ -39,6 +40,7 @@ const VehicleUsageHistory = () => {
       const { data, error } = await supabase
         .from("controle_uso_veiculo")
         .select("*")
+        .eq("status", "completo")
         .order("data", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(50);
@@ -65,7 +67,8 @@ const VehicleUsageHistory = () => {
     return timeString.substring(0, 5);
   };
 
-  const calculateKmDiff = (initial: number, final: number) => {
+  const calculateKmDiff = (initial: number, final: number | null) => {
+    if (final === null) return "N/A";
     return (final - initial).toFixed(1);
   };
 
@@ -86,13 +89,13 @@ const VehicleUsageHistory = () => {
       'Responsável': record.responsavel_veiculo,
       'Motorista': record.nome_motorista,
       'Hora Saída': formatTime(record.hora_saida),
-      'Hora Retorno': formatTime(record.hora_retorno),
+      'Hora Retorno': record.hora_retorno ? formatTime(record.hora_retorno) : '',
       'Destino/Finalidade': record.destino_finalidade,
       'KM Inicial': record.km_inicial,
-      'KM Final': record.km_final,
+      'KM Final': record.km_final || '',
       'KM Percorrido': calculateKmDiff(record.km_inicial, record.km_final),
       'Observações': record.observacoes || '',
-      'Assinatura': record.assinatura,
+      'Assinatura': record.assinatura || '',
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -191,7 +194,7 @@ const VehicleUsageHistory = () => {
                         <div>
                           <p className="text-sm font-medium">Horário</p>
                           <p className="text-sm text-muted-foreground">
-                            Saída: {formatTime(record.hora_saida)} | Retorno: {formatTime(record.hora_retorno)}
+                            Saída: {formatTime(record.hora_saida)} | Retorno: {record.hora_retorno ? formatTime(record.hora_retorno) : 'N/A'}
                           </p>
                         </div>
                       </div>
@@ -209,7 +212,7 @@ const VehicleUsageHistory = () => {
                         <p className="text-sm font-medium mb-1">Quilometragem</p>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span>Inicial: {record.km_inicial} km</span>
-                          <span>Final: {record.km_final} km</span>
+                          <span>Final: {record.km_final !== null ? `${record.km_final} km` : 'N/A'}</span>
                           <span className="font-medium text-primary">
                             Percorrido: {calculateKmDiff(record.km_inicial, record.km_final)} km
                           </span>
@@ -221,10 +224,12 @@ const VehicleUsageHistory = () => {
                           <p className="text-sm text-muted-foreground">{record.observacoes}</p>
                         </div>
                       )}
-                      <div>
-                        <p className="text-sm font-medium">Assinatura</p>
-                        <p className="text-sm text-muted-foreground italic">{record.assinatura}</p>
-                      </div>
+                      {record.assinatura && (
+                        <div>
+                          <p className="text-sm font-medium">Assinatura</p>
+                          <p className="text-sm text-muted-foreground italic">{record.assinatura}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>

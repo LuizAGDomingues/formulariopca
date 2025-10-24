@@ -5,9 +5,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Car } from "lucide-react";
+import { Car, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+interface OpenTrip {
+  id: string;
+  data: string;
+  nome_motorista: string;
+  hora_saida: string;
+  km_inicial: number;
+  destino_finalidade: string;
+}
 
 const VehicleUsage = () => {
   const navigate = useNavigate();
@@ -18,20 +28,57 @@ const VehicleUsage = () => {
     periodoReferencia: new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase(),
   };
 
-  const [formData, setFormData] = useState({
+  const [activeTab, setActiveTab] = useState("saida");
+  const [openTrips, setOpenTrips] = useState<OpenTrip[]>([]);
+  const [selectedTrip, setSelectedTrip] = useState<OpenTrip | null>(null);
+  const [loadingTrips, setLoadingTrips] = useState(false);
+
+  const [saidaData, setSaidaData] = useState({
     data: new Date().toISOString().split('T')[0],
     nomeMotorista: "",
     horaSaida: "",
-    horaRetorno: "",
     destinoFinalidade: "",
     kmInicial: "",
-    kmFinal: "",
-    observacoes: "",
-    assinatura: "",
   });
 
+  const [retornoData, setRetornoData] = useState({
+    data: new Date().toISOString().split('T')[0],
+    nomeMotorista: "",
+    horaRetorno: "",
+    kmFinal: "",
+    observacoes: "",
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (activeTab === "retorno") {
+      loadOpenTrips();
+    }
+  }, [activeTab]);
+
+  const loadOpenTrips = async () => {
+    setLoadingTrips(true);
+    try {
+      const { data, error } = await supabase
+        .from("controle_uso_veiculo")
+        .select("id, data, nome_motorista, hora_saida, km_inicial, destino_finalidade")
+        .eq("status", "em_andamento")
+        .order("data", { ascending: false });
+
+      if (error) throw error;
+      setOpenTrips(data || []);
+    } catch (error) {
+      console.error("Erro ao carregar viagens:", error);
+      toast({
+        title: "Erro ao carregar",
+        description: "Não foi possível carregar as viagens em andamento.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingTrips(false);
+    }
+  };
+
+  const handleSaidaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -39,22 +86,19 @@ const VehicleUsage = () => {
         responsavel_veiculo: vehicleInfo.responsavelVeiculo,
         veiculo: vehicleInfo.veiculo,
         periodo_referencia: vehicleInfo.periodoReferencia,
-        data: formData.data,
-        nome_motorista: formData.nomeMotorista,
-        hora_saida: formData.horaSaida,
-        hora_retorno: formData.horaRetorno,
-        destino_finalidade: formData.destinoFinalidade,
-        km_inicial: parseFloat(formData.kmInicial),
-        km_final: parseFloat(formData.kmFinal),
-        observacoes: formData.observacoes,
-        assinatura: formData.assinatura,
+        data: saidaData.data,
+        nome_motorista: saidaData.nomeMotorista,
+        hora_saida: saidaData.horaSaida,
+        destino_finalidade: saidaData.destinoFinalidade,
+        km_inicial: parseFloat(saidaData.kmInicial),
+        status: "em_andamento",
       });
 
       if (error) throw error;
 
       toast({
-        title: "Registro salvo com sucesso!",
-        description: "O controle de uso do veículo foi registrado.",
+        title: "Saída registrada!",
+        description: "A saída do veículo foi registrada com sucesso.",
       });
 
       navigate("/sucesso-uso");
@@ -68,6 +112,47 @@ const VehicleUsage = () => {
     }
   };
 
+  const handleRetornoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedTrip) {
+      toast({
+        title: "Selecione uma viagem",
+        description: "Por favor, selecione uma viagem em andamento para registrar o retorno.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("controle_uso_veiculo")
+        .update({
+          hora_retorno: retornoData.horaRetorno,
+          km_final: parseFloat(retornoData.kmFinal),
+          observacoes: retornoData.observacoes,
+          status: "completo",
+        })
+        .eq("id", selectedTrip.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Retorno registrado!",
+        description: "O retorno do veículo foi registrado com sucesso.",
+      });
+
+      navigate("/sucesso-uso");
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      toast({
+        title: "Erro ao salvar",
+        description: "Ocorreu um erro ao salvar o retorno. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background p-4 md:p-8">
       <div className="max-w-3xl mx-auto">
@@ -75,7 +160,7 @@ const VehicleUsage = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-accent rounded-full mb-4">
             <Car className="w-8 h-8 text-accent-foreground" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Registro de Uso do Veículo</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Controle de Uso do Veículo</h1>
           <div className="text-sm text-muted-foreground space-y-1">
             <p><strong>Veículo:</strong> {vehicleInfo.veiculo}</p>
             <p><strong>Responsável:</strong> {vehicleInfo.responsavelVeiculo}</p>
@@ -85,132 +170,225 @@ const VehicleUsage = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Dados da Utilização</CardTitle>
+            <CardTitle>Registro de Uso</CardTitle>
             <CardDescription>
-              Preencha os dados de uso do veículo
+              Registre a saída ou o retorno do veículo
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="data">Data *</Label>
-                  <Input
-                    id="data"
-                    type="date"
-                    value={formData.data}
-                    onChange={(e) => setFormData({ ...formData, data: e.target.value })}
-                    required
-                  />
-                </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="saida">Registrar Saída</TabsTrigger>
+                <TabsTrigger value="retorno">Registrar Retorno</TabsTrigger>
+              </TabsList>
 
-                <div className="space-y-2">
-                  <Label htmlFor="nomeMotorista">Nome do Motorista *</Label>
-                  <Input
-                    id="nomeMotorista"
-                    placeholder="Nome completo"
-                    value={formData.nomeMotorista}
-                    onChange={(e) => setFormData({ ...formData, nomeMotorista: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
+              <TabsContent value="saida">
+                <form onSubmit={handleSaidaSubmit} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="data-saida">Data *</Label>
+                      <Input
+                        id="data-saida"
+                        type="date"
+                        value={saidaData.data}
+                        onChange={(e) => setSaidaData({ ...saidaData, data: e.target.value })}
+                        required
+                      />
+                    </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="horaSaida">Hora de Saída *</Label>
-                  <Input
-                    id="horaSaida"
-                    type="time"
-                    value={formData.horaSaida}
-                    onChange={(e) => setFormData({ ...formData, horaSaida: e.target.value })}
-                    required
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="motorista-saida">Nome do Motorista *</Label>
+                      <Input
+                        id="motorista-saida"
+                        placeholder="Nome completo"
+                        value={saidaData.nomeMotorista}
+                        onChange={(e) => setSaidaData({ ...saidaData, nomeMotorista: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="horaRetorno">Hora de Retorno *</Label>
-                  <Input
-                    id="horaRetorno"
-                    type="time"
-                    value={formData.horaRetorno}
-                    onChange={(e) => setFormData({ ...formData, horaRetorno: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="hora-saida">Hora de Saída *</Label>
+                      <Input
+                        id="hora-saida"
+                        type="time"
+                        value={saidaData.horaSaida}
+                        onChange={(e) => setSaidaData({ ...saidaData, horaSaida: e.target.value })}
+                        required
+                      />
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="destinoFinalidade">Destino / Finalidade do Serviço *</Label>
-                <Textarea
-                  id="destinoFinalidade"
-                  placeholder="Descreva o destino e finalidade"
-                  value={formData.destinoFinalidade}
-                  onChange={(e) => setFormData({ ...formData, destinoFinalidade: e.target.value })}
-                  required
-                  rows={3}
-                />
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="km-inicial">KM Inicial *</Label>
+                      <Input
+                        id="km-inicial"
+                        type="number"
+                        step="0.1"
+                        placeholder="0.0"
+                        value={saidaData.kmInicial}
+                        onChange={(e) => setSaidaData({ ...saidaData, kmInicial: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="kmInicial">KM Inicial *</Label>
-                  <Input
-                    id="kmInicial"
-                    type="number"
-                    step="0.1"
-                    placeholder="0.0"
-                    value={formData.kmInicial}
-                    onChange={(e) => setFormData({ ...formData, kmInicial: e.target.value })}
-                    required
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="destino">Destino / Finalidade do Serviço *</Label>
+                    <Textarea
+                      id="destino"
+                      placeholder="Descreva o destino e finalidade"
+                      value={saidaData.destinoFinalidade}
+                      onChange={(e) => setSaidaData({ ...saidaData, destinoFinalidade: e.target.value })}
+                      required
+                      rows={3}
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="kmFinal">KM Final *</Label>
-                  <Input
-                    id="kmFinal"
-                    type="number"
-                    step="0.1"
-                    placeholder="0.0"
-                    value={formData.kmFinal}
-                    onChange={(e) => setFormData({ ...formData, kmFinal: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
+                  <div className="flex gap-4">
+                    <Button type="button" variant="outline" className="flex-1" onClick={() => navigate("/")}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" className="flex-1" size="lg">
+                      Registrar Saída
+                    </Button>
+                  </div>
+                </form>
+              </TabsContent>
 
-              <div className="space-y-2">
-                <Label htmlFor="observacoes">Observações</Label>
-                <Textarea
-                  id="observacoes"
-                  placeholder="Observações adicionais (opcional)"
-                  value={formData.observacoes}
-                  onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-                  rows={3}
-                />
-              </div>
+              <TabsContent value="retorno">
+                {loadingTrips ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Carregando viagens em andamento...
+                  </div>
+                ) : openTrips.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Não há viagens em andamento para registrar retorno.
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label>Selecione a Viagem</Label>
+                      <div className="space-y-2">
+                        {openTrips.map((trip) => (
+                          <Card
+                            key={trip.id}
+                            className={`cursor-pointer transition-colors ${
+                              selectedTrip?.id === trip.id
+                                ? "border-primary bg-accent"
+                                : "hover:bg-accent/50"
+                            }`}
+                            onClick={() => {
+                              setSelectedTrip(trip);
+                              setRetornoData({
+                                ...retornoData,
+                                nomeMotorista: trip.nome_motorista,
+                              });
+                            }}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex justify-between items-start">
+                                <div className="space-y-1">
+                                  <p className="font-semibold">{trip.nome_motorista}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Saída: {new Date(trip.data).toLocaleDateString('pt-BR')} às {trip.hora_saida}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    KM Inicial: {trip.km_inicial}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Destino: {trip.destino_finalidade}
+                                  </p>
+                                </div>
+                                {selectedTrip?.id === trip.id && (
+                                  <ArrowRight className="w-5 h-5 text-primary" />
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="assinatura">Assinatura (Nome completo) *</Label>
-                <Input
-                  id="assinatura"
-                  placeholder="Digite seu nome completo"
-                  value={formData.assinatura}
-                  onChange={(e) => setFormData({ ...formData, assinatura: e.target.value })}
-                  required
-                />
-              </div>
+                    {selectedTrip && (
+                      <form onSubmit={handleRetornoSubmit} className="space-y-6 pt-4 border-t">
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="data-retorno">Data *</Label>
+                            <Input
+                              id="data-retorno"
+                              type="date"
+                              value={retornoData.data}
+                              onChange={(e) => setRetornoData({ ...retornoData, data: e.target.value })}
+                              required
+                            />
+                          </div>
 
-              <div className="flex gap-4">
-                <Button type="button" variant="outline" className="flex-1" onClick={() => navigate("/")}>
-                  Cancelar
-                </Button>
-                <Button type="submit" className="flex-1" size="lg">
-                  Salvar Registro
-                </Button>
-              </div>
-            </form>
+                          <div className="space-y-2">
+                            <Label htmlFor="motorista-retorno">Nome do Motorista *</Label>
+                            <Input
+                              id="motorista-retorno"
+                              value={retornoData.nomeMotorista}
+                              onChange={(e) => setRetornoData({ ...retornoData, nomeMotorista: e.target.value })}
+                              required
+                              disabled
+                              className="bg-muted"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="hora-retorno">Hora de Retorno *</Label>
+                            <Input
+                              id="hora-retorno"
+                              type="time"
+                              value={retornoData.horaRetorno}
+                              onChange={(e) => setRetornoData({ ...retornoData, horaRetorno: e.target.value })}
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="km-final">KM Final *</Label>
+                            <Input
+                              id="km-final"
+                              type="number"
+                              step="0.1"
+                              placeholder="0.0"
+                              value={retornoData.kmFinal}
+                              onChange={(e) => setRetornoData({ ...retornoData, kmFinal: e.target.value })}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="observacoes">Observações</Label>
+                          <Textarea
+                            id="observacoes"
+                            placeholder="Observações adicionais (opcional)"
+                            value={retornoData.observacoes}
+                            onChange={(e) => setRetornoData({ ...retornoData, observacoes: e.target.value })}
+                            rows={3}
+                          />
+                        </div>
+
+                        <div className="flex gap-4">
+                          <Button type="button" variant="outline" className="flex-1" onClick={() => navigate("/")}>
+                            Cancelar
+                          </Button>
+                          <Button type="submit" className="flex-1" size="lg">
+                            Registrar Retorno
+                          </Button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>
