@@ -11,7 +11,7 @@ const ChecklistInfo = () => {
   const [formData, setFormData] = useState({
     responsavel: "",
     data: new Date().toISOString().split('T')[0],
-    placaVeiculo: "",
+    placaVeiculo: "FPG-8130",
     condutor: "",
   });
 
@@ -38,7 +38,7 @@ const ChecklistInfo = () => {
             <Snowflake className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Checklist Semanal de Frota</h1>
-          <p className="text-muted-foreground">Carros de Serviços - Refrigeração</p>
+          <p className="text-muted-foreground">Carro de Serviço - Sandeiro - Montes Gallego</p>
           <p className="text-sm text-muted-foreground mt-2">
             Periodicidade: Segunda e Sexta-feira
           </p>
@@ -83,6 +83,8 @@ const ChecklistInfo = () => {
                   value={formData.placaVeiculo}
                   onChange={(e) => setFormData({ ...formData, placaVeiculo: e.target.value.toUpperCase() })}
                   required
+                  disabled
+                  className="bg-muted"
                 />
               </div>
 
