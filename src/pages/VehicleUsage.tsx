@@ -58,7 +58,6 @@ const VehicleUsage = () => {
 
   useEffect(() => {
     if (!selectedTrip) return;
-    // Scroll to form after render
     setTimeout(() => {
       retornoFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
@@ -277,122 +276,106 @@ const VehicleUsage = () => {
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    <div className="space-y-2">
-                      <Label>Selecione a Viagem</Label>
+                    {selectedTrip ? (
+                      <>
+                        <div className="rounded-lg border bg-accent/30 p-4 space-y-1">
+                          <p className="text-sm font-medium text-muted-foreground">Registrando retorno para:</p>
+                          <p className="font-semibold">{selectedTrip.nome_motorista}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Saída: {new Date(selectedTrip.data).toLocaleDateString('pt-BR')} às {selectedTrip.hora_saida} · KM Inicial: {selectedTrip.km_inicial}
+                          </p>
+                          <p className="text-sm text-muted-foreground">Destino: {selectedTrip.destino_finalidade}</p>
+                          <Button type="button" variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => setSelectedTrip(null)}>
+                            ← Trocar viagem
+                          </Button>
+                        </div>
+
+                        <form ref={retornoFormRef} onSubmit={handleRetornoSubmit} className="space-y-6">
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="data-retorno">Data *</Label>
+                              <Input id="data-retorno" type="date" value={retornoData.data} onChange={(e) => setRetornoData({ ...retornoData, data: e.target.value })} required />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="motorista-retorno">Nome do Motorista *</Label>
+                              <Input id="motorista-retorno" value={retornoData.nomeMotorista} onChange={(e) => setRetornoData({ ...retornoData, nomeMotorista: e.target.value })} required disabled className="bg-muted" />
+                            </div>
+                          </div>
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="hora-retorno">Hora de Retorno *</Label>
+                              <Input id="hora-retorno" type="time" value={retornoData.horaRetorno} onChange={(e) => setRetornoData({ ...retornoData, horaRetorno: e.target.value })} required />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="km-final">KM Final *</Label>
+                              <Input id="km-final" type="number" step="0.1" placeholder="0.0" value={retornoData.kmFinal} onChange={(e) => setRetornoData({ ...retornoData, kmFinal: e.target.value })} required />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="observacoes">Observações</Label>
+                            <Textarea id="observacoes" placeholder="Observações adicionais (opcional)" value={retornoData.observacoes} onChange={(e) => setRetornoData({ ...retornoData, observacoes: e.target.value })} rows={3} />
+                          </div>
+                          <div className="flex gap-4">
+                            <Button type="button" variant="outline" className="flex-1" onClick={() => navigate("/")}>Cancelar</Button>
+                            <Button type="submit" className="flex-1" size="lg">Registrar Retorno</Button>
+                          </div>
+                        </form>
+
+                        {openTrips.filter((t) => t.id !== selectedTrip.id).length > 0 && (
+                          <div className="space-y-3 pt-4 border-t">
+                            <Label className="text-muted-foreground">Outros Retornos em Aberto</Label>
+                            <div className="space-y-2">
+                              {openTrips.filter((t) => t.id !== selectedTrip.id).map((trip) => (
+                                <Card
+                                  key={trip.id}
+                                  className="cursor-pointer transition-colors hover:bg-accent/50"
+                                  onClick={() => {
+                                    setSelectedTrip(trip);
+                                    setRetornoData((prev) => ({ ...prev, nomeMotorista: trip.nome_motorista, horaRetorno: "", kmFinal: "", observacoes: "" }));
+                                  }}
+                                >
+                                  <CardContent className="p-3">
+                                    <p className="font-semibold text-sm">{trip.nome_motorista}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {new Date(trip.data).toLocaleDateString('pt-BR')} às {trip.hora_saida} · KM: {trip.km_inicial}
+                                    </p>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : (
                       <div className="space-y-2">
-                        {openTrips.map((trip) => (
-                          <Card
-                            key={trip.id}
-                            className={`cursor-pointer transition-colors ${
-                              selectedTrip?.id === trip.id
-                                ? "border-primary bg-accent"
-                                : "hover:bg-accent/50"
-                            }`}
-                            onClick={() => {
-                              setSelectedTrip(trip);
-                                setRetornoData((prev) => ({
-                                  ...prev,
-                                  nomeMotorista: trip.nome_motorista,
-                                }));
-                            }}
-                          >
-                            <CardContent className="p-4">
-                              <div className="flex justify-between items-start">
-                                <div className="space-y-1">
-                                  <p className="font-semibold">{trip.nome_motorista}</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    Saída: {new Date(trip.data).toLocaleDateString('pt-BR')} às {trip.hora_saida}
-                                  </p>
-                                  <p className="text-sm text-muted-foreground">
-                                    KM Inicial: {trip.km_inicial}
-                                  </p>
-                                  <p className="text-sm text-muted-foreground">
-                                    Destino: {trip.destino_finalidade}
-                                  </p>
-                                </div>
-                                {selectedTrip?.id === trip.id && (
-                                  <ArrowRight className="w-5 h-5 text-primary" />
-                                )}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </div>
-
-                    {selectedTrip && (
-                      <form ref={retornoFormRef} onSubmit={handleRetornoSubmit} className="space-y-6 pt-4 border-t">
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="data-retorno">Data *</Label>
-                            <Input
-                              id="data-retorno"
-                              type="date"
-                              value={retornoData.data}
-                              onChange={(e) => setRetornoData({ ...retornoData, data: e.target.value })}
-                              required
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="motorista-retorno">Nome do Motorista *</Label>
-                            <Input
-                              id="motorista-retorno"
-                              value={retornoData.nomeMotorista}
-                              onChange={(e) => setRetornoData({ ...retornoData, nomeMotorista: e.target.value })}
-                              required
-                              disabled
-                              className="bg-muted"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="hora-retorno">Hora de Retorno *</Label>
-                            <Input
-                              id="hora-retorno"
-                              type="time"
-                              value={retornoData.horaRetorno}
-                              onChange={(e) => setRetornoData({ ...retornoData, horaRetorno: e.target.value })}
-                              required
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="km-final">KM Final *</Label>
-                            <Input
-                              id="km-final"
-                              type="number"
-                              step="0.1"
-                              placeholder="0.0"
-                              value={retornoData.kmFinal}
-                              onChange={(e) => setRetornoData({ ...retornoData, kmFinal: e.target.value })}
-                              required
-                            />
-                          </div>
-                        </div>
-
+                        <Label>Selecione a Viagem</Label>
                         <div className="space-y-2">
-                          <Label htmlFor="observacoes">Observações</Label>
-                          <Textarea
-                            id="observacoes"
-                            placeholder="Observações adicionais (opcional)"
-                            value={retornoData.observacoes}
-                            onChange={(e) => setRetornoData({ ...retornoData, observacoes: e.target.value })}
-                            rows={3}
-                          />
+                          {openTrips.map((trip) => (
+                            <Card
+                              key={trip.id}
+                              className="cursor-pointer transition-colors hover:bg-accent/50"
+                              onClick={() => {
+                                setSelectedTrip(trip);
+                                setRetornoData((prev) => ({ ...prev, nomeMotorista: trip.nome_motorista }));
+                              }}
+                            >
+                              <CardContent className="p-4">
+                                <div className="flex justify-between items-start">
+                                  <div className="space-y-1">
+                                    <p className="font-semibold">{trip.nome_motorista}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      Saída: {new Date(trip.data).toLocaleDateString('pt-BR')} às {trip.hora_saida}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">KM Inicial: {trip.km_inicial}</p>
+                                    <p className="text-sm text-muted-foreground">Destino: {trip.destino_finalidade}</p>
+                                  </div>
+                                  <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
                         </div>
-
-                        <div className="flex gap-4">
-                          <Button type="button" variant="outline" className="flex-1" onClick={() => navigate("/")}>
-                            Cancelar
-                          </Button>
-                          <Button type="submit" className="flex-1" size="lg">
-                            Registrar Retorno
-                          </Button>
-                        </div>
-                      </form>
+                      </div>
                     )}
                   </div>
                 )}
