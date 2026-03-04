@@ -55,6 +55,21 @@ const VehicleUsage = () => {
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    if (openTrips.length === 0) {
+      setSelectedTrip(null);
+      setRetornoData((prev) => ({ ...prev, nomeMotorista: "" }));
+      return;
+    }
+
+    const selectedTripStillExists = selectedTrip && openTrips.some((trip) => trip.id === selectedTrip.id);
+    if (selectedTripStillExists) return;
+
+    const firstOpenTrip = openTrips[0];
+    setSelectedTrip(firstOpenTrip);
+    setRetornoData((prev) => ({ ...prev, nomeMotorista: firstOpenTrip.nome_motorista }));
+  }, [openTrips, selectedTrip]);
+
   const loadOpenTrips = async () => {
     setLoadingTrips(true);
     try {
@@ -281,10 +296,10 @@ const VehicleUsage = () => {
                             }`}
                             onClick={() => {
                               setSelectedTrip(trip);
-                              setRetornoData({
-                                ...retornoData,
-                                nomeMotorista: trip.nome_motorista,
-                              });
+                                setRetornoData((prev) => ({
+                                  ...prev,
+                                  nomeMotorista: trip.nome_motorista,
+                                }));
                             }}
                           >
                             <CardContent className="p-4">
