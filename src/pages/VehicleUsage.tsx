@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,7 @@ const VehicleUsage = () => {
   const [openTrips, setOpenTrips] = useState<OpenTrip[]>([]);
   const [selectedTrip, setSelectedTrip] = useState<OpenTrip | null>(null);
   const [loadingTrips, setLoadingTrips] = useState(false);
+  const retornoFormRef = useRef<HTMLFormElement>(null);
 
   const [saidaData, setSaidaData] = useState({
     data: new Date().toISOString().split('T')[0],
@@ -56,19 +57,12 @@ const VehicleUsage = () => {
   }, [activeTab]);
 
   useEffect(() => {
-    if (openTrips.length === 0) {
-      setSelectedTrip(null);
-      setRetornoData((prev) => ({ ...prev, nomeMotorista: "" }));
-      return;
-    }
-
-    const selectedTripStillExists = selectedTrip && openTrips.some((trip) => trip.id === selectedTrip.id);
-    if (selectedTripStillExists) return;
-
-    const firstOpenTrip = openTrips[0];
-    setSelectedTrip(firstOpenTrip);
-    setRetornoData((prev) => ({ ...prev, nomeMotorista: firstOpenTrip.nome_motorista }));
-  }, [openTrips, selectedTrip]);
+    if (!selectedTrip) return;
+    // Scroll to form after render
+    setTimeout(() => {
+      retornoFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  }, [selectedTrip]);
 
   const loadOpenTrips = async () => {
     setLoadingTrips(true);
@@ -327,7 +321,7 @@ const VehicleUsage = () => {
                     </div>
 
                     {selectedTrip && (
-                      <form onSubmit={handleRetornoSubmit} className="space-y-6 pt-4 border-t">
+                      <form ref={retornoFormRef} onSubmit={handleRetornoSubmit} className="space-y-6 pt-4 border-t">
                         <div className="grid md:grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="data-retorno">Data *</Label>
