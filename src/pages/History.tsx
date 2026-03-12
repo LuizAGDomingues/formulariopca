@@ -82,7 +82,7 @@ const History = () => {
     }
 
     const exportData = checklists.map(checklist => ({
-      'Data': new Date(checklist.data).toLocaleDateString('pt-BR'),
+      'Data': new Date(checklist.data + 'T00:00:00').toLocaleDateString('pt-BR'),
       'Responsável': checklist.responsavel,
       'Placa Veículo': checklist.placa_veiculo,
       'Condutor': checklist.condutor,
