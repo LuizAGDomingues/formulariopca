@@ -364,7 +364,7 @@ const VehicleUsage = () => {
                                   <div className="space-y-1">
                                     <p className="font-semibold">{trip.nome_motorista}</p>
                                     <p className="text-sm text-muted-foreground">
-                                      Saída: {new Date(trip.data).toLocaleDateString('pt-BR')} às {trip.hora_saida}
+                                      Saída: {new Date(trip.data + 'T00:00:00').toLocaleDateString('pt-BR')} às {trip.hora_saida}
                                     </p>
                                     <p className="text-sm text-muted-foreground">KM Inicial: {trip.km_inicial}</p>
                                     <p className="text-sm text-muted-foreground">Destino: {trip.destino_finalidade}</p>

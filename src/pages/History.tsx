@@ -185,7 +185,7 @@ const History = () => {
                       <div>
                         <p className="text-sm text-muted-foreground">Data da Inspeção</p>
                         <p className="font-medium">
-                          {new Date(checklist.data).toLocaleDateString('pt-BR')}
+                          {new Date(checklist.data + 'T00:00:00').toLocaleDateString('pt-BR')}
                         </p>
                       </div>
                     </div>
