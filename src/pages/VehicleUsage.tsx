@@ -337,7 +337,7 @@ const VehicleUsage = () => {
                                   <CardContent className="p-3">
                                     <p className="font-semibold text-sm">{trip.nome_motorista}</p>
                                     <p className="text-xs text-muted-foreground">
-                                      {new Date(trip.data).toLocaleDateString('pt-BR')} às {trip.hora_saida} · KM: {trip.km_inicial}
+                                      {new Date(trip.data + 'T00:00:00').toLocaleDateString('pt-BR')} às {trip.hora_saida} · KM: {trip.km_inicial}
                                     </p>
                                   </CardContent>
                                 </Card>
