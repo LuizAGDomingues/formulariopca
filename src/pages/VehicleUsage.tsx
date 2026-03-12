@@ -282,7 +282,7 @@ const VehicleUsage = () => {
                           <p className="text-sm font-medium text-muted-foreground">Registrando retorno para:</p>
                           <p className="font-semibold">{selectedTrip.nome_motorista}</p>
                           <p className="text-sm text-muted-foreground">
-                            Saída: {new Date(selectedTrip.data).toLocaleDateString('pt-BR')} às {selectedTrip.hora_saida} · KM Inicial: {selectedTrip.km_inicial}
+                            Saída: {new Date(selectedTrip.data + 'T00:00:00').toLocaleDateString('pt-BR')} às {selectedTrip.hora_saida} · KM Inicial: {selectedTrip.km_inicial}
                           </p>
                           <p className="text-sm text-muted-foreground">Destino: {selectedTrip.destino_finalidade}</p>
                           <Button type="button" variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => setSelectedTrip(null)}>
