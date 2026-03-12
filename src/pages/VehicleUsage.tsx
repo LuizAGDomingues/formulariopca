@@ -282,7 +282,7 @@ const VehicleUsage = () => {
                           <p className="text-sm font-medium text-muted-foreground">Registrando retorno para:</p>
                           <p className="font-semibold">{selectedTrip.nome_motorista}</p>
                           <p className="text-sm text-muted-foreground">
-                            Saída: {new Date(selectedTrip.data).toLocaleDateString('pt-BR')} às {selectedTrip.hora_saida} · KM Inicial: {selectedTrip.km_inicial}
+                            Saída: {new Date(selectedTrip.data + 'T00:00:00').toLocaleDateString('pt-BR')} às {selectedTrip.hora_saida} · KM Inicial: {selectedTrip.km_inicial}
                           </p>
                           <p className="text-sm text-muted-foreground">Destino: {selectedTrip.destino_finalidade}</p>
                           <Button type="button" variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => setSelectedTrip(null)}>
@@ -337,7 +337,7 @@ const VehicleUsage = () => {
                                   <CardContent className="p-3">
                                     <p className="font-semibold text-sm">{trip.nome_motorista}</p>
                                     <p className="text-xs text-muted-foreground">
-                                      {new Date(trip.data).toLocaleDateString('pt-BR')} às {trip.hora_saida} · KM: {trip.km_inicial}
+                                      {new Date(trip.data + 'T00:00:00').toLocaleDateString('pt-BR')} às {trip.hora_saida} · KM: {trip.km_inicial}
                                     </p>
                                   </CardContent>
                                 </Card>
@@ -364,7 +364,7 @@ const VehicleUsage = () => {
                                   <div className="space-y-1">
                                     <p className="font-semibold">{trip.nome_motorista}</p>
                                     <p className="text-sm text-muted-foreground">
-                                      Saída: {new Date(trip.data).toLocaleDateString('pt-BR')} às {trip.hora_saida}
+                                      Saída: {new Date(trip.data + 'T00:00:00').toLocaleDateString('pt-BR')} às {trip.hora_saida}
                                     </p>
                                     <p className="text-sm text-muted-foreground">KM Inicial: {trip.km_inicial}</p>
                                     <p className="text-sm text-muted-foreground">Destino: {trip.destino_finalidade}</p>

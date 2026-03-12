@@ -161,7 +161,7 @@ const Checklist = () => {
             <div>
               <h1 className="text-2xl font-bold">Checklist Semanal</h1>
               <p className="text-sm text-muted-foreground">
-                {info.responsavel} • {new Date(info.data).toLocaleDateString('pt-BR')} • {info.placaVeiculo}
+                {info.responsavel} • {new Date(info.data + 'T00:00:00').toLocaleDateString('pt-BR')} • {info.placaVeiculo}
               </p>
             </div>
           </div>
